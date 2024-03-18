@@ -100,8 +100,8 @@ class _RegistrationPgState extends State<RegistrationPg> {
               height: 20,
             ),
             TextButton(
-              onPressed: () {Navigator.push(context, MaterialPageRoute(builder:(context)=>const QrCode() )
-              );
+              onPressed: () {
+
               register();
               },
               child: Text('Register'),

@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:html';
+
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import 'QrCode.dart';
 import 'Registrationpg.dart';
 
 void main() {
@@ -10,13 +15,43 @@ void main() {
 }
 
 class LoginPage extends StatefulWidget {
+
+
   const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
+
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  TextEditingController RollNo=TextEditingController();
+  TextEditingController Password=TextEditingController();
+
+    Future<void> login() async {
+      Uri url = Uri.parse('https://scnner-web.onrender.com/api/login');
+      var response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode({'rollno': RollNo.text, 'password': Password.text}));
+
+
+      print(response.statusCode);
+      print(response.body);
+      var data = jsonDecode(response.body);
+      print(data["message"]);
+      if (response.statusCode == 200) {
+        Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const QrCode ()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(data["message"])));
+      }
+    }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +61,8 @@ class _LoginPageState extends State<LoginPage> {
         children: [
         const  Text('Login',
               style: TextStyle(height: 5, fontSize: 25, color: Colors.white)),
-         const TextField(
+          TextField(
+           controller: RollNo,
             decoration:  InputDecoration(
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(width:1,color: Colors.white)
@@ -36,7 +72,8 @@ class _LoginPageState extends State<LoginPage> {
          const SizedBox(
             height: 20,
           ),
-         const TextField(
+          TextField(
+           controller: Password,
             decoration:  InputDecoration(
                 labelText: "Enter Your Password",
                 enabledBorder: OutlineInputBorder(
@@ -44,7 +81,10 @@ class _LoginPageState extends State<LoginPage> {
                 )),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              login();
+    },
+
             child: Text('Login'),
             style: ButtonStyle(
                 foregroundColor:
